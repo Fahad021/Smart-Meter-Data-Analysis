@@ -29,16 +29,17 @@ def reshape2daily(df_in):
     df (pd.DataFrame): Dataframe holding time series data with daily resolution and hours in every columns.
 
     """
-    df = (pd.pivot_table(df_in,
-                         values="y",
-                         index=[df_in.timestamp.dt.to_period("D"), df_in.id],
-                         columns=df_in.timestamp.dt.strftime("%H:%M")
-                         )
-            .reset_index()
-            .sort_values(["id", "timestamp"])
-            .set_index("timestamp")
-         )
-    return df
+    return (
+        pd.pivot_table(
+            df_in,
+            values="y",
+            index=[df_in.timestamp.dt.to_period("D"), df_in.id],
+            columns=df_in.timestamp.dt.strftime("%H:%M"),
+        )
+        .reset_index()
+        .sort_values(["id", "timestamp"])
+        .set_index("timestamp")
+    )
 
 
 data_list =  glob.glob("*.json")
@@ -47,10 +48,10 @@ winter_loadprofile = []
 start_date = datetime(2019, 1, 1, 00, 00)
 end_date = datetime(2020, 1, 1, 00, 00)
 
-timestamps = []
-for single_date in daterange(start_date, end_date):
-    timestamps.append(single_date.strftime("%Y-%m-%d %H:%M"))
-
+timestamps = [
+    single_date.strftime("%Y-%m-%d %H:%M")
+    for single_date in daterange(start_date, end_date)
+]
 for file_name in data_list:
     data = pd.read_json(file_name)
     data = data[['RowKey','AMIData']]
